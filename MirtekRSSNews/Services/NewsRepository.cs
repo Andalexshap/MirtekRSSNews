@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using MirtekRSSNews.Interfaces;
 using MirtekRSSNews.Models;
 
@@ -9,70 +8,79 @@ namespace MirtekRSSNews.Services
 {
     public class NewsRepository : IRssNews
     {
-        private readonly AppDbContext context;
+        private readonly AppDbContext _context;
 
         public NewsRepository(AppDbContext context)
         {
 
-            this.context = context;
+            _context = context;
         }
         public IQueryable<RSSNews> GetRSSNews()
         {
-            var response = context.MirtekRSSNews.OrderBy(x => x.Title);
+            var response = _context.MirtekRSSNews.OrderBy(x => x.Title);
 
             return response;
         }
         public RSSNews GetRSSNews(Guid id)
         {
-            return context.MirtekRSSNews.Single(x => x.Id == id);
+            return _context.MirtekRSSNews.Single(x => x.Id == id);
         }
 
         public Guid SaveRSSNews(RSSNews entity)
         {
-            if (entity.Id == default)
+            using (var context = _context)
             {
-                context.Entry(entity).State = EntityState.Added;
+                context.Add(entity);
+                context.SaveChanges();
             }
-            else
-            {
-                context.Entry(entity).State = EntityState.Modified;
-            }
-
-            context.SaveChanges();
 
             return entity.Id;
         }
         public void SaveRSSNews(List<RSSNews> entity)
         {
-            context.AddRange(entity);
-            context.SaveChanges();
-
+            using (var context = _context)
+            {
+                context.AddRange(entity);
+                context.SaveChanges();
+            }
         }
         public void DeleteRSSNews(RSSNews entity)
         {
-            context.MirtekRSSNews.Remove(entity);
-            context.SaveChanges();
+            using (var context = _context)
+            {
+                context.Remove(entity);
+                context.SaveChanges();
+            }
         }
         public IQueryable<UrlRssAdress> GetUrlRssAdress()
         {
-            return context.UrlRssAdresses;
+            return _context.UrlRssAdresses;
         }
         public Guid SaveUrlRssAdress(UrlRssAdress entity)
         {
-            context.Add(entity);
-            context.SaveChanges();
+            using (var context = _context)
+            {
+                context.Add(entity);
+                context.SaveChanges();
+            }
 
             return entity.Id;
         }
         public void SaveUrlRssAdress(List<UrlRssAdress> entity)
         {
-            context.AddRange(entity);
-            context.SaveChanges();
+            using (var context = _context)
+            {
+                context.AddRange(entity);
+                context.SaveChanges();
+            }
         }
         public void DeleteRSSChanel(UrlRssAdress entity)
         {
-            context.UrlRssAdresses.Remove(entity);
-            context.SaveChanges();
+            using (var context = _context)
+            {
+                context.Remove(entity);
+                context.SaveChanges();
+            }
         }
     }
 
