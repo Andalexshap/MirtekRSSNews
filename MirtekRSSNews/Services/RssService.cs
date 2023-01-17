@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Extensions.Configuration;
@@ -20,7 +19,7 @@ namespace MirtekRSSNews.Services
         }
         public void ParseRssUrl(UrlRssAdress url)
         {
-            string parseFormat = "ddd, dd MMM yyyy HH:mm:ss zzz";
+            string parseFormat = "ddd, dd MMM yyyy, HH:mm:ss zzz";
 
             XDocument rssXmlDoc = new XDocument();
             XNamespace yandex = "http://news.yandex.ru";
@@ -41,11 +40,10 @@ namespace MirtekRSSNews.Services
                     {
                         RSSNews news = new RSSNews
                         {
-                            Id = new Guid(),
+                            Id = Guid.NewGuid(),
                             Title = i.title,
                             Text = i.text,
-                            DateOfNews = DateTime.ParseExact(i.data, parseFormat,
-                                                                              CultureInfo.InvariantCulture)
+                            DateOfNews = DateTime.Parse(i.data)
                         };
                         ListOfNews.Add(news);
                     }
@@ -59,18 +57,21 @@ namespace MirtekRSSNews.Services
         }
         public void SetDefaultRssChanel()
         {
+            var listUrl = new List<UrlRssAdress>();
+
             var urlRssAdress = new UrlRssAdress
             {
                 Id = new Guid(),
                 Url = configuration["RssCHanel:Yandex"]
             };
-            _rssNews.SaveUrlRssAdress(urlRssAdress);
+            listUrl.Add(urlRssAdress);
             urlRssAdress = new UrlRssAdress
             {
                 Id = new Guid(),
                 Url = configuration["RssCHanel:Mchs"]
             };
-            _rssNews.SaveUrlRssAdress(urlRssAdress);
+            listUrl.Add(urlRssAdress);
+            _rssNews.SaveUrlRssAdress(listUrl);
         }
 
     }

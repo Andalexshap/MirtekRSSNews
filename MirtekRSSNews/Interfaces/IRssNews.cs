@@ -14,6 +14,8 @@ namespace MirtekRSSNews.Interfaces
         public void DeleteRSSNews(RSSNews entity);
         public IQueryable<UrlRssAdress> GetUrlRssAdress();
         public Guid SaveUrlRssAdress(UrlRssAdress entity);
+        public void SaveUrlRssAdress(List<UrlRssAdress> entity);
+
         public void DeleteRSSChanel(UrlRssAdress entity);
     }
 }

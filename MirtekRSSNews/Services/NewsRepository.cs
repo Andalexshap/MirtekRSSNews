@@ -39,12 +39,14 @@ namespace MirtekRSSNews.Services
             }
 
             context.SaveChanges();
+
             return entity.Id;
         }
         public void SaveRSSNews(List<RSSNews> entity)
         {
             context.AddRange(entity);
             context.SaveChanges();
+
         }
         public void DeleteRSSNews(RSSNews entity)
         {
@@ -57,14 +59,15 @@ namespace MirtekRSSNews.Services
         }
         public Guid SaveUrlRssAdress(UrlRssAdress entity)
         {
-            var response = GetUrlRssAdress().FirstOrDefault(x => x.Url == entity.Url);
-            if (response == null)
-            {
-                context.Entry(entity).State = EntityState.Added;
-            }
-
+            context.Add(entity);
             context.SaveChanges();
+
             return entity.Id;
+        }
+        public void SaveUrlRssAdress(List<UrlRssAdress> entity)
+        {
+            context.AddRange(entity);
+            context.SaveChanges();
         }
         public void DeleteRSSChanel(UrlRssAdress entity)
         {
