@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using MirtekRSSNews.Interfaces;
 using MirtekRSSNews.Models;
 
@@ -11,23 +10,16 @@ namespace MirtekRSSNews.Services
     public class NewsRepository : IRssNews
     {
         private readonly AppDbContext context;
-        private readonly IConfiguration configuration;
-        private readonly IRssService rssService;
 
-        public NewsRepository(IConfiguration configuration, AppDbContext context, IRssService rssService)
+        public NewsRepository(AppDbContext context)
         {
-            this.configuration = configuration;
+
             this.context = context;
-            this.rssService = rssService;
         }
         public IQueryable<RSSNews> GetRSSNews()
         {
             var response = context.MirtekRSSNews.OrderBy(x => x.Title);
-            if (response.Count() == 0)
-            {
-                SetDefaultRssChanel();
-                response = context.MirtekRSSNews.OrderBy(x => x.Title);
-            }
+
             return response;
         }
         public RSSNews GetRSSNews(Guid id)
@@ -78,23 +70,6 @@ namespace MirtekRSSNews.Services
         {
             context.UrlRssAdresses.Remove(entity);
             context.SaveChanges();
-        }
-        public void SetDefaultRssChanel()
-        {
-            var urlRssAdress = new UrlRssAdress
-            {
-                Id = new Guid(),
-                Url = configuration["RssCHanel:Yandex"]
-            };
-            SaveUrlRssAdress(urlRssAdress);
-            rssService.ParseRssUrl(urlRssAdress);
-            urlRssAdress = new UrlRssAdress
-            {
-                Id = new Guid(),
-                Url = configuration["RssCHanel:Mchs"]
-            };
-            SaveUrlRssAdress(urlRssAdress);
-            rssService.ParseRssUrl(urlRssAdress);
         }
     }
 

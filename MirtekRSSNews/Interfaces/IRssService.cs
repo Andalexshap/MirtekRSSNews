@@ -5,5 +5,7 @@ namespace MirtekRSSNews.Interfaces
     public interface IRssService
     {
         public void ParseRssUrl(UrlRssAdress url);
+        public void SetDefaultRssChanel();
+
     }
 }

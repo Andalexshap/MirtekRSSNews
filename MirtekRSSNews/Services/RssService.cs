@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.Extensions.Configuration;
 using MirtekRSSNews.Interfaces;
 using MirtekRSSNews.Models;
 
@@ -10,10 +11,12 @@ namespace MirtekRSSNews.Services
 {
     public class RssService : IRssService
     {
-        private readonly NewsRepository _newsRepository;
-        public RssService(NewsRepository newsRepository)
+        private readonly IRssNews _rssNews;
+        private readonly IConfiguration configuration;
+        public RssService(IRssNews rssNews, IConfiguration configuration)
         {
-            _newsRepository = newsRepository;
+            this.configuration = configuration;
+            _rssNews = rssNews;
         }
         public void ParseRssUrl(UrlRssAdress url)
         {
@@ -34,18 +37,40 @@ namespace MirtekRSSNews.Services
                 var ListOfNews = new List<RSSNews>();
                 foreach (var i in items)
                 {
-                    RSSNews news = new RSSNews
+                    try
                     {
-                        Id = new Guid(),
-                        Title = i.title,
-                        Text = i.text,
-                        DateOfNews = DateTime.ParseExact(i.data, parseFormat,
-                                                      CultureInfo.InvariantCulture)
-                    };
-                    ListOfNews.Add(news);
+                        RSSNews news = new RSSNews
+                        {
+                            Id = new Guid(),
+                            Title = i.title,
+                            Text = i.text,
+                            DateOfNews = DateTime.ParseExact(i.data, parseFormat,
+                                                                              CultureInfo.InvariantCulture)
+                        };
+                        ListOfNews.Add(news);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                 }
-                _newsRepository.SaveRSSNews(ListOfNews);
+                _rssNews.SaveRSSNews(ListOfNews);
             }
+        }
+        public void SetDefaultRssChanel()
+        {
+            var urlRssAdress = new UrlRssAdress
+            {
+                Id = new Guid(),
+                Url = configuration["RssCHanel:Yandex"]
+            };
+            _rssNews.SaveUrlRssAdress(urlRssAdress);
+            urlRssAdress = new UrlRssAdress
+            {
+                Id = new Guid(),
+                Url = configuration["RssCHanel:Mchs"]
+            };
+            _rssNews.SaveUrlRssAdress(urlRssAdress);
         }
 
     }

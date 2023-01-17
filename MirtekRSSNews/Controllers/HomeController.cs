@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using MirtekRSSNews.Interfaces;
 using MirtekRSSNews.Models;
-using MirtekRSSNews.Services;
 
 namespace MirtekRSSNews.Controllers
 {
@@ -13,15 +11,16 @@ namespace MirtekRSSNews.Controllers
         private readonly IRssNews _rssNews;
         private readonly IRssService _rssService;
 
-        public HomeController(NewsRepository newsRepository, IRssService rssService)
+        public HomeController(IRssNews rssNews, IRssService rssService)
         {
-            _rssNews = newsRepository;
+            _rssNews = rssNews;
             _rssService = rssService;
         }
 
         public IActionResult Index()
         {
             var model = _rssNews.GetRSSNews();
+
             return View(model);
         }
         public IActionResult Search(string searchString)
@@ -73,10 +72,12 @@ namespace MirtekRSSNews.Controllers
             return RedirectToAction("AddRssAddress");
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [HttpPost("AddDefaultRssAddress")]
+        public IActionResult AddDefaultRssAddress()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            _rssService.SetDefaultRssChanel();
+
+            return RedirectToAction("AddRssAddress");
         }
 
         [HttpGet]

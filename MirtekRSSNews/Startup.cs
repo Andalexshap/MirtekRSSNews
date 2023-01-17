@@ -23,7 +23,7 @@ namespace MirtekRSSNews
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IRssService, RssService>();
-            services.AddTransient<NewsRepository>();
+            services.AddTransient<IRssNews, NewsRepository>();
             services.AddControllersWithViews();
             services.AddDbContext<AppDbContext>(x => x.UseSqlServer(Configuration.GetConnectionString("MirtekRssNews")));
         }
