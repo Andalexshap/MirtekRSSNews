@@ -1,0 +1,25 @@
+﻿@model MirtekRSSNews.Models.RSSNews
+
+<div class="text-center">
+    <h3>Редактировать новость</h3>
+</div>
+<div>
+    <form asp-controller="Home" asp-action="NewsEdit" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div asp-validation-summary="All"></div>
+
+        <div>
+            <label asp-for="Title"></label>
+            <input asp-for="Title" />
+            <span asp-validation-for="Title"></span>
+        </div>
+        <div>
+            <label asp-for="Text"></label>
+            <input asp-for="Text" />
+            <span asp-validation-for="Text"></span>
+        </div>
+        <input type="submit" value="Save" />
+    </form>
+</div>
+
+

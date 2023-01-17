@@ -1,0 +1,36 @@
+﻿@using MirtekRSSNews.Models
+@model IQueryable<MirtekRSSNews.Models.RSSNews>
+@{
+    ViewData["Title"] = "Search";
+}
+<div class="text-center">
+    <h2 class="display-4">News</h2>
+</div>
+<div>
+    <form asp-controller="Home" asp-action="Search">
+        <p>
+            <input type="text" name="SearchString" />
+            <input type="submit" value="Search" />
+        </p>
+    </form>
+    <form asp-controller="Home" asp-action="Index">
+        <p>
+            <input type="submit" value="Сброс" />
+        </p>
+    </form>
+</div>
+<div>
+    @foreach (RSSNews entity in Model)
+    {
+            <div>
+                <h4>@entity.Title</h4>
+                <h5>@entity.Text</h5>
+                <p>@entity.DateOfNews
+                <form method="post" asp-controller="Home" asp-action="NewsDelete">
+                    <input type="hidden" value="@entity.Id" name="Id"/>
+                    <input type="submit" value="удалить"/>
+                </form>
+                </p>
+            </div>
+    }
+</div>

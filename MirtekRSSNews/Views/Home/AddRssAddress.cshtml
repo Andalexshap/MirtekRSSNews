@@ -1,0 +1,28 @@
+﻿@using MirtekRSSNews.Models
+
+<div>
+    <h4>Сохраненные RSS каналы</h4>
+    @foreach (UrlRssAdress entity in Model)
+    {
+        <div>
+            <h4>@entity.Url</h4>
+            <form method="post" asp-controller="Home" asp-action="RssDelete">
+                <input type="hidden" value="@entity.Id" name="Id"/>
+                <input type="submit" value="удалить"/>
+            </form>
+        </div>
+    }
+</div>
+
+<div class="text-center">
+    <h3>Введите адресс Rss канала</h3>
+</div>
+<div>
+    <form asp-controller="Home" method="post" asp-action="SaveRssAddress">
+        <div>
+            <input name="Url" type="text"/>
+        </div>
+        <input type="submit" value="Save" />
+    </form>
+</div>
+
