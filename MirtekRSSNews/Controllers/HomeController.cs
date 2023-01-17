@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MirtekRSSNews.Interfaces;
 using MirtekRSSNews.Models;
@@ -8,66 +9,56 @@ namespace MirtekRSSNews.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IRssNews _rssNews;
-        private readonly IRssService _rssService;
+        private readonly IRssNewsService _rssNewsService;
+        private readonly IRssChanelsService _rssChanelsService;
 
-        public HomeController(IRssNews rssNews, IRssService rssService)
+        public HomeController(IRssNewsService rssNewsService, IRssChanelsService rssChanelsService)
         {
-            _rssNews = rssNews;
-            _rssService = rssService;
+            _rssNewsService = rssNewsService;
+            _rssChanelsService = rssChanelsService;
         }
 
         public IActionResult Index()
         {
-            var model = _rssNews.GetRSSNews();
+            var model = _rssNewsService.GetRSSNews();
 
             return View(model);
         }
+
         public IActionResult Search(string searchString)
         {
             if (String.IsNullOrEmpty(searchString))
             {
                 return RedirectToAction("Index");
             }
-            var model = _rssNews.GetRSSNews().Where(x => x.Title.Contains(searchString));
+            var model = _rssNewsService.GetRSSNews().Where(x => x.Title.Contains(searchString));
             return View(model);
         }
 
         public IActionResult NewsEdit(Guid id)
         {
-            RSSNews model = id == default ? new RSSNews() : _rssNews.GetRSSNews(id);
-            return View(model);
-        }
-
-        [HttpPost]
-        public IActionResult NewsEdit(RSSNews model)
-        {
-            if (ModelState.IsValid)
-            {
-                _rssNews.SaveRSSNews(model);
-                return RedirectToAction("Index");
-            }
+            RSSNews model = id == default ? new RSSNews() : _rssNewsService.GetRSSNews(id);
             return View(model);
         }
 
         [HttpPost]
         public IActionResult NewsDelete(Guid id)
         {
-            _rssNews.DeleteRSSNews(new RSSNews { Id = id });
+            _rssNewsService.DeleteRSSNews(new RSSNews { Id = id });
             return RedirectToAction("Index");
         }
 
         [HttpGet("AddRssAddress")]
         public IActionResult AddRssAddress()
         {
-            var rssChanels = _rssNews.GetUrlRssAdress();
+            var rssChanels = _rssNewsService.GetRssUrls();
             return View("AddRssAddress", rssChanels);
         }
 
         [HttpPost("SaveRssAddress")]
-        public IActionResult SaveRssAddress(UrlRssAdress model)
+        public IActionResult SaveRssAddress(RSSUrl model)
         {
-            _rssNews.SaveUrlRssAdress(model);
+            _rssNewsService.SaveRssUrl(model);
 
             return RedirectToAction("AddRssAddress");
         }
@@ -75,18 +66,18 @@ namespace MirtekRSSNews.Controllers
         [HttpPost("AddDefaultRssAddress")]
         public IActionResult AddDefaultRssAddress()
         {
-            _rssService.SetDefaultRssChanel();
+            _rssChanelsService.SetDefaultRssChanel();
 
             return RedirectToAction("AddRssAddress");
         }
 
         [HttpGet]
-        public IActionResult ParseUrlAddress()
+        public async Task<IActionResult> ParseUrlAddress()
         {
-            var rssChanels = _rssNews.GetUrlRssAdress();
+            var rssChanels = _rssNewsService.GetRssUrls();
             foreach (var rssChanel in rssChanels)
             {
-                _rssService.ParseRssUrl(rssChanel);
+                await _rssChanelsService.ParseRssUrl(rssChanel);
             }
             return RedirectToAction("Index");
         }
@@ -94,7 +85,7 @@ namespace MirtekRSSNews.Controllers
         [HttpPost]
         public IActionResult RssDelete(Guid id)
         {
-            _rssNews.DeleteRSSChanel(new UrlRssAdress { Id = id });
+            _rssNewsService.DeleteRSSUrl(new RSSUrl { Id = id });
             return RedirectToAction("AddRssAddress");
         }
     }

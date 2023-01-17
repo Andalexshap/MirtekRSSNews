@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.Extensions.Configuration;
 using MirtekRSSNews.Interfaces;
@@ -8,19 +9,17 @@ using MirtekRSSNews.Models;
 
 namespace MirtekRSSNews.Services
 {
-    public class RssService : IRssService
+    public class RssChanelsService : IRssChanelsService
     {
-        private readonly IRssNews _rssNews;
-        private readonly IConfiguration configuration;
-        public RssService(IRssNews rssNews, IConfiguration configuration)
+        private readonly IRssNewsService _rssNews;
+        private readonly IConfiguration _configuration;
+        public RssChanelsService(IRssNewsService rssNews, IConfiguration configuration)
         {
-            this.configuration = configuration;
+            _configuration = configuration;
             _rssNews = rssNews;
         }
-        public void ParseRssUrl(UrlRssAdress url)
+        public async Task ParseRssUrl(RSSUrl url)
         {
-            string parseFormat = "ddd, dd MMM yyyy, HH:mm:ss zzz";
-
             XDocument rssXmlDoc = new XDocument();
             XNamespace yandex = "http://news.yandex.ru";
             rssXmlDoc = XDocument.Load(url.Url);
@@ -52,26 +51,30 @@ namespace MirtekRSSNews.Services
                         continue;
                     }
                 }
-                _rssNews.SaveRSSNews(ListOfNews);
+                await _rssNews.SaveRSSNews(ListOfNews);
             }
         }
         public void SetDefaultRssChanel()
         {
-            var listUrl = new List<UrlRssAdress>();
+            var listUrl = new List<RSSUrl>();
 
-            var urlRssAdress = new UrlRssAdress
+            var urlRssAdress = new RSSUrl
             {
                 Id = new Guid(),
-                Url = configuration["RssCHanel:Yandex"]
+                Url = _configuration["RssCHanel:Yandex"]
             };
+
             listUrl.Add(urlRssAdress);
-            urlRssAdress = new UrlRssAdress
+
+            urlRssAdress = new RSSUrl
             {
                 Id = new Guid(),
-                Url = configuration["RssCHanel:Mchs"]
+                Url = _configuration["RssCHanel:Mchs"]
             };
+
             listUrl.Add(urlRssAdress);
-            _rssNews.SaveUrlRssAdress(listUrl);
+
+            _rssNews.SaveRssUrls(listUrl);
         }
 
     }

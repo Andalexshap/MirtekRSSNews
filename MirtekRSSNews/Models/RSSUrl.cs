@@ -2,7 +2,7 @@
 
 namespace MirtekRSSNews.Models
 {
-    public class UrlRssAdress
+    public class RSSUrl
     {
         public Guid Id { get; set; }
         public string Url { get; set; }

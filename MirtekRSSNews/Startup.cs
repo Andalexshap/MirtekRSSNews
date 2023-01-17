@@ -22,8 +22,8 @@ namespace MirtekRSSNews
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<IRssService, RssService>();
-            services.AddTransient<IRssNews, NewsRepository>();
+            services.AddTransient<IRssChanelsService, RssChanelsService>();
+            services.AddTransient<IRssNewsService, RssNewsService>();
             services.AddControllersWithViews();
             services.AddDbContext<AppDbContext>(x => x.UseSqlServer(Configuration.GetConnectionString("MirtekRssNews")));
         }
