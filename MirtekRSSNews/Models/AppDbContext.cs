@@ -8,7 +8,7 @@ namespace MirtekRSSNews.Models
     {
         public AppDbContext(DbContextOptions options) : base(options) { }
         public DbSet<RSSNews> MirtekRSSNews { get; set; }
-        public DbSet<UrlRssAdress> UrlRssAdresses { get; set; }
+        public DbSet<RSSUrl> UrlRssAdresses { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
